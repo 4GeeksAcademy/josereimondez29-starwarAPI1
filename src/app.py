@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
-from flask import Flask, request, jsonify, url_for
+from flask import Flask, request, jsonify, url_for, Blueprint
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
@@ -37,6 +37,8 @@ def sitemap():
     return generate_sitemap(app)
 
 # Allow CORS requests to this API
+api = Blueprint('api', __name__)
+
 CORS(api)
 
 api_blueprint = Blueprint('api', __name__)
@@ -45,6 +47,7 @@ api_blueprint = Blueprint('api', __name__)
 @api_blueprint.route('/users', methods=['GET'])
 def get_users():
     users = User.query.all()
+
     return jsonify([user.to_dict() for user in users]), 200
 
 @api_blueprint.route('/user', methods=['POST'])
