@@ -55,7 +55,7 @@ def get_users():
 @app.route('/user', methods=['POST'])
 def add_user():
     data = request.json
-    new_user = User(email=data['email'], password=data['password'], is_active=data['is_active'])
+    new_user = User(name=data['name'], email=data['email'], password=data['password'], is_active=data['is_active'])
     db.session.add(new_user)
     db.session.commit()
     return jsonify("User successfully added"), 201
