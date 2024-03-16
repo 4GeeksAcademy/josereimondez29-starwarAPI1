@@ -45,6 +45,7 @@ class Character(db.Model):
     name = db.Column(db.String(250))
     species = db.Column(db.String(250))
     gender = db.Column(db.String(250))
+    planet = db.Colums(db.string(250))
 
     def __repr__(self):
         return f"Character {self.id} de nombre {self.name}"
