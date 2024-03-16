@@ -36,15 +36,8 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-# Allow CORS requests to this API
-api = Blueprint('api', __name__)
-
-CORS(api)
-
-api_blueprint = Blueprint('api', __name__)
-
 # User Routes
-@api_blueprint.route('/users', methods=['GET'])
+@app.route('/users', methods=['GET'])
 def get_users():
     users = User.query.all()
 
@@ -59,7 +52,7 @@ def get_users():
 
     return jsonify(response_body), 200
 
-@api_blueprint.route('/user', methods=['POST'])
+@app.route('/user', methods=['POST'])
 def add_user():
     data = request.json
     new_user = User(email=data['email'], password=data['password'], is_active=data['is_active'])
@@ -67,14 +60,14 @@ def add_user():
     db.session.commit()
     return jsonify("User successfully added"), 201
 
-@api_blueprint.route('/user/<int:user_id>', methods=['GET'])
+@app.route('/user/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     user = User.query.get(user_id)
     if user:
         return jsonify({"message": "User found"}), 200
     return jsonify({"message": "User not found"}), 404
 
-@api_blueprint.route('/user/<int:user_id>', methods=['PUT'])
+@app.route('/user/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     user = User.query.get(user_id)
     if user:
@@ -86,7 +79,7 @@ def update_user(user_id):
         return jsonify({"message": "User updated"}), 200
     return jsonify({"message": "User not found"}), 404
 
-@api_blueprint.route('/user/<int:user_id>', methods=['DELETE'])
+@app.route('/user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     user = User.query.get(user_id)
     if user:
@@ -96,7 +89,7 @@ def delete_user(user_id):
     return jsonify({"message": "User not found"}), 404
 
 # Planet Routes
-@api_blueprint.route('/planets', methods=['GET'])
+@app.route('/planets', methods=['GET'])
 def get_planets():
     planets = Planet.query.all()
 
@@ -111,7 +104,7 @@ def get_planets():
 
     return jsonify(response_body), 200
 
-@api_blueprint.route('/planet', methods=['POST'])
+@app.route('/planet', methods=['POST'])
 def add_planet():
     data = request.json
     new_planet = Planet(name=data['name'], climate=data['climate'], population=data['population'])
@@ -119,14 +112,14 @@ def add_planet():
     db.session.commit()
     return jsonify("Planet successfully added"), 201
 
-@api_blueprint.route('/planet/<int:planet_id>', methods=['GET'])
+@app.route('/planet/<int:planet_id>', methods=['GET'])
 def get_planet(planet_id):
     planet = Planet.query.get(planet_id)
     if planet:
         return jsonify({"message": "Planet found"}), 200
     return jsonify({"message": "Planet not found"}), 404
 
-@api_blueprint.route('/planet/<int:planet_id>', methods=['PUT'])
+@app.route('/planet/<int:planet_id>', methods=['PUT'])
 def update_planet(planet_id):
     planet = Planet.query.get(planet_id)
     if planet:
@@ -138,7 +131,7 @@ def update_planet(planet_id):
         return jsonify({"message": "Planet updated"}), 200
     return jsonify({"message": "Planet not found"}), 404
 
-@api_blueprint.route('/planet/<int:planet_id>', methods=['DELETE'])
+@app.route('/planet/<int:planet_id>', methods=['DELETE'])
 def delete_planet(planet_id):
     planet = Planet.query.get(planet_id)
     if planet:
@@ -148,7 +141,7 @@ def delete_planet(planet_id):
     return jsonify({"message": "Planet not found"}), 404
 
 # Character Routes
-@api_blueprint.route('/characters', methods=['GET'])
+@app.route('/characters', methods=['GET'])
 def get_characters():
     characters = Character.query.all()
 
@@ -164,7 +157,7 @@ def get_characters():
     return jsonify(response_body), 200
 
     
-@api_blueprint.route('/character', methods=['POST'])
+@app.route('/character', methods=['POST'])
 def add_characters():
     data = request.json
     new_character = Character(name=data['name'], species=data['species'], homeworld=data['homeworld'])
@@ -172,14 +165,14 @@ def add_characters():
     db.session.commit()
     return jsonify("Character successfully added"), 201
 
-@api_blueprint.route('/character/<int:character_id>', methods=['GET'])
+@app.route('/character/<int:character_id>', methods=['GET'])
 def get_character(character_id):
     character = Character.query.get(character_id)
     if character:
         return jsonify({"message": "Character found"}), 200
     return jsonify({"message": "Character not found"}), 404
 
-@api_blueprint.route('/character/<int:character_id>', methods=['PUT'])
+@app.route('/character/<int:character_id>', methods=['PUT'])
 def update_character(character_id):
     character = Character.query.get(character_id)
     if character:
@@ -191,7 +184,7 @@ def update_character(character_id):
         return jsonify({"message": "Character updated"}), 200
     return jsonify({"message": "Character not found"}), 404
 
-@api_blueprint.route('/character/<int:character_id>', methods=['DELETE'])
+@app.route('/character/<int:character_id>', methods=['DELETE'])
 def delete_character(character_id):
     character = Character.query.get(character_id)
     if character:
@@ -201,7 +194,7 @@ def delete_character(character_id):
     return jsonify({"message": "Character not found"}), 404
 
 # Favorite Routes
-@api_blueprint.route('/favorites', methods=['GET'])
+@app.route('/favorites', methods=['GET'])
 def get_favorites():
     favorites = Favorite.query.all()
 
@@ -217,7 +210,7 @@ def get_favorites():
     return jsonify(response_body), 200
 
     
-@api_blueprint.route('/favorite', methods=['POST'])
+@app.route('/favorite', methods=['POST'])
 def add_favorite():
     data = request.json
     new_favorite = Favorite(user_id=data['user_id'], planet_id=data['planet_id'], character_id=data['character_id'])
@@ -225,14 +218,14 @@ def add_favorite():
     db.session.commit()
     return jsonify("New favorite successfully added"), 201
 
-@api_blueprint.route('/favorite/<int:favorite_id>', methods=['GET'])
+@app.route('/favorite/<int:favorite_id>', methods=['GET'])
 def get_favorite(favorite_id):
     favorite = Favorite.query.get(favorite_id)
     if favorite:
         return jsonify({"message": "Favorite found"}), 200
     return jsonify({"message": "Favorite not found"}), 404
 
-@api_blueprint.route('/favorite/<int:favorite_id>', methods=['PUT'])
+@app.route('/favorite/<int:favorite_id>', methods=['PUT'])
 def update_favorite(favorite_id):
     favorite = Favorite.query.get(favorite_id)
     if favorite:
@@ -244,7 +237,7 @@ def update_favorite(favorite_id):
         return jsonify({"message": "Favorite updated"}), 200
     return jsonify({"message": "Favorite not found"}), 404
 
-@api_blueprint.route('/favorite/<int:favorite_id>', methods=['DELETE'])
+@app.route('/favorite/<int:favorite_id>', methods=['DELETE'])
 def delete_favorite(favorite_id):
     favorite = Favorite.query.get(favorite_id)
     if favorite:
@@ -253,7 +246,7 @@ def delete_favorite(favorite_id):
         return jsonify({"message": "Favorite deleted"}), 200
     return jsonify({"message": "Favorite not found"}), 404
 
-@api_blueprint.route('/hello', methods=['GET'])
+@app.route('/hello', methods=['GET'])
 def handle_hello():
     return jsonify({"message": "Hello from the backend!"}), 200
 
