@@ -64,7 +64,12 @@ def add_user():
 def get_user(user_id):
     user = User.query.get(user_id)
     if user:
-        return jsonify({"message": "User found"}), 200
+        user_data = {
+            "id": user.id,
+            "username": user.name,
+            "email": user.email,
+        }
+        return jsonify({"message": "User founded", "user": user_data}), 200
     return jsonify({"message": "User not found"}), 404
 
 @app.route('/user/<int:user_id>', methods=['PUT'])
@@ -116,7 +121,13 @@ def add_planet():
 def get_planet(planet_id):
     planet = Planet.query.get(planet_id)
     if planet:
-        return jsonify({"message": "Planet found"}), 200
+        planet_data = {
+            "id": planet.id,
+            "name": planet.name,
+            "climate": planet.climate,
+            "population": planet.population,
+        }
+        return jsonify({"message": "Planet found", "planet": planet_data}), 200
     return jsonify({"message": "Planet not found"}), 404
 
 @app.route('/planet/<int:planet_id>', methods=['PUT'])
@@ -169,7 +180,13 @@ def add_characters():
 def get_character(character_id):
     character = Character.query.get(character_id)
     if character:
-        return jsonify({"message": "Character found"}), 200
+        character_data = {
+            "id": character.id,
+            "name": character.name,
+            "species": character.species,
+            "gender": character.gender,
+        }
+        return jsonify({"message": "Character found", "character": character_data}), 200
     return jsonify({"message": "Character not found"}), 404
 
 @app.route('/character/<int:character_id>', methods=['PUT'])
