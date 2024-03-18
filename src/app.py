@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Planet, Character, Favorite
+from models import db, User, Planet, Character, Vehicle_Starship, FavoriteCharacter, FavoritePlanet, FavoriteVehicleStarship
 #from models import Person
 
 app = Flask(__name__)
@@ -211,61 +211,37 @@ def delete_character(character_id):
     return jsonify({"message": "Character not found"}), 404
 
 # Favorite Routes
-@app.route('/favorites', methods=['GET'])
-def get_favorites():
-    favorites = Favorite.query.all()
 
-    favorites_serialized = []
-    for favorite in favorites:
-        favorites_serialized.append(favorite.serialize())
-
-    response_body = {
-        "msg": "ok",
-        "result": favorites_serialized
-    }
-
-    return jsonify(response_body), 200
+@app.route('/user/favorites', methods=['GET'])
+def favorites_user():
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({'msg': "debes enviar informacion en el body"}), 400
+    if 'user_id' not in body:
+        return jsonify({'msg': 'El campo user_id es obligatorio'}), 400
+    user = User.query.get(body['user_id'])
+    if user is None:
+        return jsonify({'msg': "El usuario con el id {} no existe".format(body['user_id'])}), 404
+    favorite_planets = db.session.query(FavoritePlanet, Planet).join(Planet).filter(FavoritePlanet.user_id==body['user_id']).all()
+    favorite_planets_serialized = []
+    for favorite_item, planet_item in favorite_planets:
+        favorite_planets_serialized.append({"favorite_planet_id": favorite_item.id, "planet": planet_item.serialize()})
+        return jsonify({"msg": "ok", "results": favorite_planets_serialized})
+    favorite_character= db.session.query(FavoriteCharacter, Character).join(Character).filter(FavoriteCharacter.user_id==body['user_id']).all()
+    favorite_character_serialized = []
+    for favorite_item, character_item in favorite_character:
+        favorite_character_serialized.append({"favorite_character_id": favorite_item.id, "character": character_item.serialize()})
+        return jsonify({"msg": "ok", "results": favorite_character_serialized})
+    favorite_vehicle_starship= db.session.query(FavoriteVehicleStarship, Vehicle_Starship).join(Vehicle_Starship).filter(FavoriteVehicleStarship.user_id==body['user_id']).all()
+    favorite_vehicle_starship_serialized = []
+    for favorite_item, vehicle_starship_item in favorite_vehicle_starship:
+        favorite_vehicle_starship_serialized.append({"favorite_vehicle_starship_id": favorite_item.id, "starship": vehicle_starship_item.serialize()})
+        return jsonify({"msg": "ok", "results": favorite_vehicle_starship_serialized})
+    print(user)
+    return jsonify({'msg': 'ok'})
 
     
-@app.route('/favorite', methods=['POST'])
-def add_favorite():
-    data = request.json
-    new_favorite = Favorite(user_id=data['user_id'], planet_id=data['planet_id'], character_id=data['character_id'])
-    db.session.add(new_favorite)
-    db.session.commit()
-    return jsonify("New favorite successfully added"), 201
 
-@app.route('/favorite/<int:favorite_id>', methods=['GET'])
-def get_favorite(favorite_id):
-    favorite = Favorite.query.get(favorite_id)
-    if favorite:
-        return jsonify({"message": "Favorite found"}), 200
-    return jsonify({"message": "Favorite not found"}), 404
-
-@app.route('/favorite/<int:favorite_id>', methods=['PUT'])
-def update_favorite(favorite_id):
-    favorite = Favorite.query.get(favorite_id)
-    if favorite:
-        data = request.json
-        favorite.user_id = data.get('user_id', favorite.user_id)
-        favorite.planet_id = data.get('planet_id', favorite.planet_id)
-        favorite.character_id = data.get('character_id', favorite.character_id)
-        db.session.commit()
-        return jsonify({"message": "Favorite updated"}), 200
-    return jsonify({"message": "Favorite not found"}), 404
-
-@app.route('/favorite/<int:favorite_id>', methods=['DELETE'])
-def delete_favorite(favorite_id):
-    favorite = Favorite.query.get(favorite_id)
-    if favorite:
-        db.session.delete(favorite)
-        db.session.commit()
-        return jsonify({"message": "Favorite deleted"}), 200
-    return jsonify({"message": "Favorite not found"}), 404
-
-@app.route('/hello', methods=['GET'])
-def handle_hello():
-    return jsonify({"message": "Hello from the backend!"}), 200
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
